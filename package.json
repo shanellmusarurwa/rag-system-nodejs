@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.13.2",
+    "chromadb": "^3.1.6",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "multer": "^2.0.2",
+    "natural": "^8.1.0",
+    "nodemon": "^3.1.11",
+    "uuid": "^13.0.0",
+    "winston": "^3.18.3"
+  }
+}
