@@ -1,31 +1,17 @@
+// routes/documentRoutes.js
 const express = require("express");
 const router = express.Router();
 const upload = require("../middleware/upload");
-const {
-  uploadDocument,
-  getUploadStats,
-  resetVectorStore,
-} = require("../controllers/documentController");
+const documentController = require("../controllers/documentController");
 
-/**
- * @route POST /api/upload
- * @desc Upload and process a document
- * @access Public
- */
-router.post("/upload", upload.single("file"), uploadDocument);
+// POST /documents/upload - single file field named 'file'
+router.post(
+  "/upload",
+  upload.single("file"),
+  documentController.uploadDocument
+);
 
-/**
- * @route GET /api/stats
- * @desc Get vector store statistics
- * @access Public
- */
-router.get("/stats", getUploadStats);
-
-/**
- * @route POST /api/reset
- * @desc Reset vector store (delete and recreate)
- * @access Public
- */
-router.post("/reset", resetVectorStore);
+// GET /documents/uploads
+router.get("/uploads", documentController.listUploads);
 
 module.exports = router;
