@@ -1,4 +1,3 @@
-// main.js
 require("dotenv").config();
 const express = require("express");
 const path = require("path");
@@ -6,6 +5,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 
 const documentRoutes = require("./routes/documentRoutes");
+const promptRoutes = require("./routes/promptRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,13 +18,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // mount routes
-app.use("/documents", documentRoutes);
+app.use("/upload", documentRoutes);
+app.use("/prompt", promptRoutes);
 
-// global error handler for multer and other errors
+// health check
+app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
+// global error handler
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err);
-  if (err.name === "MulterError")
-    return res.status(400).json({ error: err.message });
   res
     .status(err.status || 500)
     .json({ error: err.message || "Internal server error" });

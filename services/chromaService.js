@@ -1,11 +1,8 @@
 const axios = require("axios");
 
-const CHROMA_DB_HOST = process.env.CHROMA_DB_HOST;
-const COLLECTION = "rag_documents";
-
-const baseURL = CHROMA_DB_HOST.startsWith("http")
-  ? CHROMA_DB_HOST
-  : `http://${CHROMA_DB_HOST}`;
+const HOST = process.env.CHROMA_DB_HOST;
+const COLLECTION = process.env.CHROMA_COLLECTION_NAME || "rag_documents";
+const baseURL = HOST.startsWith("http") ? HOST : `http://${HOST}`;
 
 async function ensureCollection() {
   try {
@@ -15,14 +12,23 @@ async function ensureCollection() {
   }
 }
 
-async function storeChunks(ids, embeddings, documents, metadatas) {
+async function storeChunks(ids, embeddings, docs, metadatas) {
   await ensureCollection();
   await axios.post(`${baseURL}/collections/${COLLECTION}/add`, {
     ids,
     embeddings,
-    documents,
+    documents: docs,
     metadatas,
   });
 }
 
-module.exports = { storeChunks };
+async function queryChroma(queryEmbedding, nResults) {
+  const resp = await axios.post(`${baseURL}/collections/${COLLECTION}/query`, {
+    query_embeddings: [queryEmbedding],
+    n_results: nResults,
+    include: ["documents", "metadatas", "distances"],
+  });
+  return resp.data.documents?.[0] || [];
+}
+
+module.exports = { storeChunks, queryChroma };
