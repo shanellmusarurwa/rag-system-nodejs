@@ -1,18 +1,27 @@
-const axios = require("axios");
+const { pipeline } = require("@xenova/transformers");
+
+let embedder;
+
+async function getEmbedder() {
+  if (!embedder) {
+    embedder = await pipeline(
+      "feature-extraction",
+      process.env.EMBED_MODEL_NAME
+    );
+  }
+  return embedder;
+}
 
 async function embedTexts(texts) {
-  const HF_API_KEY = process.env.HF_API_KEY;
-  const model = process.env.EMBED_MODEL_NAME;
+  const model = await getEmbedder();
+  const embeddings = [];
 
-  const response = await axios.post(
-    `https://api-inference.huggingface.co/embeddings/${model}`,
-    { inputs: texts },
-    {
-      headers: { Authorization: `Bearer ${HF_API_KEY}` },
-    }
-  );
+  for (const text of texts) {
+    const output = await model(text, { pooling: "mean", normalize: true });
+    embeddings.push(Array.from(output.data));
+  }
 
-  return response.data;
+  return embeddings;
 }
 
 module.exports = { embedTexts };
