@@ -19,14 +19,20 @@ class EmbeddingModel {
     this.initializing = true;
     try {
       console.log(`📦 Loading embedding model: ${this.modelName}...`);
-      this.model = await pipeline("feature-extraction", this.modelName, {
-        quantized: true,
-        progress_callback: (data) => {
-          if (data.status === "ready") {
-            console.log("✅ Embedding model loaded");
-          }
-        },
-      });
+      this.model = await pipeline(
+        "feature-extraction",
+        "sentence-transformers/all-MiniLM-L6-V2",
+        {
+          quantized: false,
+          progress_callback: (data) => {
+            if (data.status == "ready") {
+              console.log(
+                "✔ Embedding model loaded (sentence-transformers/all-MiniLM-L6-V2)"
+              );
+            }
+          },
+        }
+      );
       this.isReady = true;
     } catch (error) {
       console.error("❌ Failed to load embedding model:", error.message);
